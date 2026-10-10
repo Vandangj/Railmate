@@ -1,0 +1,4 @@
+import { db } from 'hatchable';
+export const access='admin';
+export const methods=['GET'];
+export default async function(req,res){try{const [b,n,s,l]=await Promise.all([db.query('SELECT status,count(*)::int AS count FROM bookings GROUP BY status'),db.query('SELECT count(*)::int AS count FROM notifications'),db.query('SELECT count(*)::int AS count FROM route_searches'),db.query('SELECT id,agent_name,action,status,detail,created_at FROM agent_execution_logs ORDER BY created_at DESC LIMIT 30')]);return res.json({bookings_by_status:b.rows,notification_count:n.rows[0]?.count||0,route_search_count:s.rows[0]?.count||0,recent_agent_logs:l.rows,provider:{mode:'DEMO',live_railway_configured:false,ai_provider_configured:false}});}catch(e){console.error('admin_overview_failed',e);return res.status(500).json({error:'Admin overview is temporarily unavailable.'});}}

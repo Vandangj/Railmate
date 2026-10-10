@@ -1,0 +1,17 @@
+import { db, auth } from 'hatchable';
+export const access = 'public';
+export const methods = ['GET','POST'];
+export default async function(req,res){
+ try {
+  const user=await auth.getUser(req); if(!user) return res.status(401).json({error:'Sign in to manage demo trips.'});
+  if(req.method==='GET'){const {rows}=await db.query('SELECT id,booking_ref,origin,destination,travel_date,train_name,train_number,departure_time,arrival_time,duration_minutes,transfers,fare_inr,status,provider_mode,passengers,created_at FROM bookings WHERE user_id=$1 ORDER BY travel_date DESC,created_at DESC',[user.id]);return res.json({bookings:rows});}
+  const b=req.body||{}; for(const k of ['origin','destination','travel_date','train_name','train_number','departure_time','arrival_time','duration_minutes']) if(b[k]===undefined||b[k]===null||b[k]==='') return res.status(400).json({error:'Missing booking field: '+k});
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(String(b.travel_date))) return res.status(400).json({error:'Invalid travel date.'});
+  if(!Array.isArray(b.passengers)||b.passengers.length<1||b.passengers.length>6) return res.status(400).json({error:'Add between 1 and 6 passengers.'});
+  for(const p of b.passengers) if(!String(p.name||'').trim()||!Number.isInteger(Number(p.age))||Number(p.age)<1||Number(p.age)>120) return res.status(400).json({error:'Each passenger needs a name and valid age.'});
+  const key=String(req.headers['idempotency-key']||b.idempotency_key||'').slice(0,120); if(key){const old=await db.query('SELECT booking_ref,status FROM bookings WHERE user_id=$1 AND idempotency_key=$2',[user.id,key]);if(old.rows.length)return res.json({booking:old.rows[0],duplicate:true});}
+  const ref='DEMO-'+crypto.randomUUID().replaceAll('-','').slice(0,10).toUpperCase(); const status='DEMO_CONFIRMED'; const history=[{status,at:new Date().toISOString(),note:'Simulated demo booking only; not an IRCTC reservation.'}];
+  const ins=await db.query('INSERT INTO bookings (booking_ref,user_id,origin,destination,travel_date,train_name,train_number,departure_time,arrival_time,duration_minutes,transfers,fare_inr,status,provider_mode,passengers,status_history,idempotency_key) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15::jsonb,$16::jsonb,$17) RETURNING id,booking_ref,origin,destination,travel_date,train_name,train_number,departure_time,arrival_time,duration_minutes,transfers,fare_inr,status,provider_mode,passengers,created_at',[ref,user.id,b.origin,b.destination,b.travel_date,b.train_name,b.train_number,b.departure_time,b.arrival_time,Number(b.duration_minutes),Number(b.transfers||0),b.fare_inr==null?null:Number(b.fare_inr),status,'DEMO',JSON.stringify(b.passengers),JSON.stringify(history),key||null]);
+  const booking=ins.rows[0]; await db.query('INSERT INTO notifications (user_id,title,message,kind) VALUES ($1,$2,$3,$4)',[user.id,'Demo trip created',ref+' is a simulated RailMate booking, not a real railway reservation.','booking']); await db.query('INSERT INTO audit_logs (user_id,action,entity_type,entity_id,detail) VALUES ($1,$2,$3,$4,$5::jsonb)',[user.id,'demo_booking_created','booking',String(booking.id),JSON.stringify({booking_ref:ref})]); return res.status(201).json({booking,notice:'DEMO BOOKING ONLY — this is not an IRCTC reservation or real PNR.'});
+ }catch(e){console.error('bookings_failed',e);return res.status(500).json({error:'Booking operation failed. Please try again.'});}
+}

@@ -1,0 +1,12 @@
+{
+  "name": "railmate",
+  "version": "1.0.0",
+  "private": true,
+  "description": "RailMate — AI-Powered Multi-Agent Railway Travel Assistant",
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "frontend": "npm --prefix frontend run dev",
+    "backend": "uvicorn backend.app.main:app --reload --port 8000"
+  }
+}

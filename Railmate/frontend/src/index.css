@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  overflow-x: hidden;
+  background-color: #081225;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0B192C;
+}
+::-webkit-scrollbar-thumb {
+  background: #1E3E62;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #0EA5E9;
+}
+
+/* Glassmorphism utility */
+.glass-panel {
+  background: rgba(17, 34, 57, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(31, 58, 95, 0.6);
+}
+
+.glass-panel-hover {
+  transition: all 0.2s ease-in-out;
+}
+.glass-panel-hover:hover {
+  background: rgba(22, 44, 73, 0.9);
+  border-color: rgba(14, 165, 233, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(14, 165, 233, 0.1);
+}
+
+/* Glow effects */
+.glow-teal {
+  box-shadow: 0 0 20px -3px rgba(14, 165, 233, 0.25);
+}
+
+/* Leaflet container override */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.75rem;
+  z-index: 10;
+}

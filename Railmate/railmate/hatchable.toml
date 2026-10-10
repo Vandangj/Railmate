@@ -1,0 +1,5 @@
+name = "RailMate"
+
+[auth]
+enabled = true
+providers = ["email"]
