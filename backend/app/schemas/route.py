@@ -18,6 +18,7 @@ class RouteSearchRequest(BaseModel):
     travel_date: str = Field(..., description="Date of travel (YYYY-MM-DD)")
     preference: Optional[str] = Field("fastest", description="Ranking preference: fastest, cheapest, fewest")
     max_transfers: Optional[int] = Field(2, ge=0, le=3, description="Maximum transfers allowed (0 to 3)")
+    min_transfers: Optional[int] = Field(0, ge=0, le=3, description="Minimum transfers required (e.g. 1 for connecting trains)")
     passenger_count: Optional[int] = Field(1, ge=1, le=6)
 
 class RouteLeg(BaseModel):

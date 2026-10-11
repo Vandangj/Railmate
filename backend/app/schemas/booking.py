@@ -7,6 +7,7 @@ class PassengerSchema(BaseModel):
     age: int = Field(..., ge=1, le=120)
     gender: str = Field(..., pattern="^(Male|Female|Other|M|F|O)$")
     berth_preference: Optional[str] = Field("No Preference", description="Lower, Middle, Upper, Side Lower, Side Upper, Window")
+    seat_number: Optional[str] = Field(None, description="Selected coach/seat number (e.g. S1-12, B2-34)")
 
 class BookingPreviewRequest(BaseModel):
     route_id: str

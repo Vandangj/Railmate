@@ -17,10 +17,12 @@ const LandingPage: React.FC = () => {
   };
 
   const popularRoutes = [
-    { from: 'Mumbai', to: 'Jaipur', note: 'Direct & 1-Hop options' },
+    { from: 'Delhi', to: 'Mumbai', note: 'Golden Quadrilateral Superfast' },
+    { from: 'Delhi', to: 'Jaipur', note: 'Fast intercity & Vande Bharat' },
+    { from: 'Mumbai', to: 'Jaipur', note: 'Direct & 1-Hop via Ahmedabad' },
     { from: 'Mumbai', to: 'Ahmedabad', note: 'High frequency express' },
-    { from: 'Delhi', to: 'Jaipur', note: 'Fast intercity connection' },
-    { from: 'Delhi', to: 'Varanasi', note: 'Heritage route' },
+    { from: 'Delhi', to: 'Varanasi', note: 'Heritage route via Kanpur' },
+    { from: 'Bengaluru', to: 'Chennai', note: 'Southern Shatabdi corridor' },
   ];
 
   return (

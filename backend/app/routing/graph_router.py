@@ -30,6 +30,7 @@ class NetworkXRoutePlanner:
         destination_query: str,
         travel_date: str,
         max_transfers: int = 2,
+        min_transfers: int = 0,
         preference: str = "fastest",
         min_transfer_minutes: int = 45,
         max_transfer_minutes: int = 720
@@ -69,8 +70,8 @@ class NetworkXRoutePlanner:
 
         itineraries = []
 
-        # 1. Direct routes (0 transfers)
-        if self.graph.has_edge(matched_orig, matched_dest):
+        # 1. Direct routes (0 transfers) - only include if min_transfers <= 0
+        if min_transfers <= 0 and self.graph.has_edge(matched_orig, matched_dest):
             for edge_idx, edge_data in self.graph[matched_orig][matched_dest].items():
                 s = edge_data["schedule"]
                 leg = {
@@ -104,8 +105,8 @@ class NetworkXRoutePlanner:
                     "connection_at": None,
                     "connection_wait_minutes": None,
                     "legs": [leg],
-                    "source": "CURATED_DEMO_DATA",
-                    "status": "Illustrative schedule — not live availability"
+                    "source": s.get("provider_mode", "LIVE"),
+                    "status": "Live Indian Railway Schedule" if s.get("provider_mode") == "LIVE" else "Illustrative schedule — not live availability"
                 })
 
         # 2. Multi-hop routes (1 transfer) if max_transfers >= 1
@@ -182,8 +183,8 @@ class NetworkXRoutePlanner:
                             "connection_at": s1["to_city"],
                             "connection_wait_minutes": wait,
                             "legs": [leg1, leg2],
-                            "source": "CURATED_DEMO_DATA",
-                            "status": "Illustrative schedule — not live availability"
+                            "source": s1.get("provider_mode", "LIVE"),
+                            "status": "Live Indian Railway Schedule" if s1.get("provider_mode") == "LIVE" else "Illustrative schedule — not live availability"
                         })
 
         # Rank results based on preference

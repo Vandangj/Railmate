@@ -43,7 +43,7 @@ const RouteComparisonPage: React.FC = () => {
 
   useEffect(() => {
     executeSearch();
-  }, [preference]);
+  }, [preference, searchParams]);
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -137,6 +137,40 @@ const RouteComparisonPage: React.FC = () => {
             </button>
           </div>
         </form>
+
+        {/* Quick Route Presets */}
+        <div className="flex items-center gap-2 pt-2 flex-wrap">
+          <span className="text-xs text-slate-400 font-medium">Popular Corridors:</span>
+          {[
+            { from: 'Delhi', to: 'Mumbai' },
+            { from: 'Delhi', to: 'Jaipur' },
+            { from: 'Mumbai', to: 'Ahmedabad' },
+            { from: 'Mumbai', to: 'Jaipur' },
+            { from: 'Delhi', to: 'Varanasi' },
+            { from: 'Bengaluru', to: 'Chennai' },
+            { from: 'Mumbai', to: 'Goa' },
+            { from: 'Mumbai', to: 'Pune' },
+          ].map((pair) => (
+            <button
+              key={`${pair.from}-${pair.to}`}
+              type="button"
+              onClick={() => {
+                setOrigin(pair.from);
+                setDestination(pair.to);
+                setSearchParams({
+                  origin: pair.from,
+                  destination: pair.to,
+                  date: travelDate,
+                  pref: preference,
+                  transfers: String(maxTransfers),
+                });
+              }}
+              className="text-xs px-2.5 py-1 rounded-lg bg-railway-navy border border-railway-border/60 text-slate-300 hover:text-railway-teal hover:border-railway-teal/50 transition-all font-medium"
+            >
+              {pair.from} → {pair.to}
+            </button>
+          ))}
+        </div>
 
         {/* Filter Ranking Tabs */}
         <div className="flex items-center justify-between pt-3 border-t border-railway-border/60 flex-wrap gap-3">

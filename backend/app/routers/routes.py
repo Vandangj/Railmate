@@ -26,6 +26,7 @@ def search_routes(
         travel_date=body.travel_date,
         preference=body.preference or "fastest",
         max_transfers=body.max_transfers if body.max_transfers is not None else 2,
+        min_transfers=body.min_transfers if body.min_transfers is not None else 0,
         user_id=user_id,
         db=db
     )

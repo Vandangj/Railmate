@@ -24,7 +24,7 @@ class BaseAIProvider(abc.ABC):
 
 
 class GeminiAIProvider(BaseAIProvider):
-    def __init__(self, api_key: str, model_name: str = "gemini-1.5-flash"):
+    def __init__(self, api_key: str, model_name: str = "gemini-3.5-flash"):
         self.api_key = api_key
         self.model_name = model_name
 
@@ -32,12 +32,28 @@ class GeminiAIProvider(BaseAIProvider):
     def provider_name(self) -> str:
         return "GOOGLE_GEMINI"
 
+    async def _call_gemini(self, prompt: str) -> str:
+        import google.generativeai as genai
+        genai.configure(api_key=self.api_key)
+
+        models_to_try = [self.model_name]
+        for fallback_model in ["gemini-3.5-flash", "gemini-3.8-flash"]:
+            if fallback_model not in models_to_try:
+                models_to_try.append(fallback_model)
+
+        last_error = None
+        for m_name in models_to_try:
+            try:
+                model = genai.GenerativeModel(m_name)
+                response = await model.generate_content_async(prompt)
+                return response.text.strip()
+            except Exception as e:
+                last_error = e
+                continue
+        raise last_error or Exception("Gemini generation failed on all candidate models")
+
     async def parse_travel_intent(self, user_message: str, history: Optional[List[Dict[str, str]]] = None) -> Dict[str, Any]:
         try:
-            import google.generativeai as genai
-            genai.configure(api_key=self.api_key)
-            model = genai.GenerativeModel(self.model_name)
-
             prompt = f"""
 You are the Natural Language Understanding (NLU) module for RailMate, an Indian railway assistant.
 Analyze the user's travel request and extract the parameters in JSON format.
@@ -52,6 +68,7 @@ Extract:
 - departure_time_preference: (string or null, e.g. "morning", "evening", "after 18:00")
 - passenger_count: (integer, default 1)
 - max_transfers: (integer, default 2. If user specifies "direct" or "no changes", set 0. If "no more than one change", set 1.)
+- min_transfers: (integer, default 0. IMPORTANT: If user mentions "at least one stop", "with stops", "with a layover", "connecting train", "with transfer", or "with changes", set min_transfers to 1. If user asks for direct only, set 0.)
 - preference: ("fastest", "cheapest", or "fewest", default "fastest")
 - is_complete: (boolean, true if both origin, destination, and travel_date are clearly identified)
 - missing_fields: (list of strings for missing required fields: "origin", "destination", "travel_date")
@@ -59,8 +76,7 @@ Extract:
 
 Return ONLY valid JSON matching this schema with no markdown code blocks or extra words.
 """
-            response = await model.generate_content_async(prompt)
-            text = response.text.strip()
+            text = await self._call_gemini(prompt)
             # Clean possible markdown formatting
             if text.startswith("```"):
                 text = re.sub(r"^```(?:json)?\n?", "", text)
@@ -71,16 +87,13 @@ Return ONLY valid JSON matching this schema with no markdown code blocks or extr
             # Fallback to deterministic parser if API fails or rate-limited
             fallback = DeterministicFallbackProvider()
             result = await fallback.parse_travel_intent(user_message, history)
-            result["notice"] = f"Gemini API unavailable ({str(e)}), used rule-based fallback."
+            result["notice"] = f"Gemini API fallback invoked ({str(e)})."
             return result
 
     async def generate_response(self, system_prompt: str, user_prompt: str) -> str:
         try:
-            import google.generativeai as genai
-            genai.configure(api_key=self.api_key)
-            model = genai.GenerativeModel(self.model_name)
-            response = await model.generate_content_async(f"{system_prompt}\n\nUser: {user_prompt}")
-            return response.text.strip()
+            prompt = f"{system_prompt}\n\nUser: {user_prompt}"
+            return await self._call_gemini(prompt)
         except Exception as e:
             return f"I understand your railway query: '{user_prompt}'. (AI notice: {str(e)})"
 
@@ -179,17 +192,30 @@ class DeterministicFallbackProvider(BaseAIProvider):
                 if city.lower() == cand_to.lower():
                     destination = city
 
-        # 2. General search across known cities
+        # Check explicit "from <city>" or "to <city>" against known cities
+        for city in sorted(self.KNOWN_CITIES, key=lambda c: len(c), reverse=True):
+            pat = re.escape(city.lower())
+            if not origin and re.search(r"\b(?:from|leaving|departing|out of)\s+" + pat + r"\b", low):
+                origin = city
+            if not destination and re.search(r"\b(?:to|reach|towards|heading to)\s+" + pat + r"\b", low):
+                destination = city
+
+        # 2. General search across remaining known cities
         if not origin or not destination:
             found = []
             for city in sorted(self.KNOWN_CITIES, key=lambda c: len(c), reverse=True):
                 if re.search(r"\b" + re.escape(city.lower()) + r"\b", low):
-                    if city not in found:
+                    if city not in found and city != origin and city != destination:
                         found.append(city)
-            if not origin and len(found) >= 1:
+            if not origin and not destination:
+                if len(found) >= 1:
+                    origin = found[0]
+                if len(found) >= 2:
+                    destination = found[1]
+            elif not origin and found:
                 origin = found[0]
-            if not destination and len(found) >= 2:
-                destination = found[1]
+            elif not destination and found:
+                destination = found[0]
 
         # Use context if still missing
         if not origin and context_origin:
@@ -203,16 +229,16 @@ class DeterministicFallbackProvider(BaseAIProvider):
         if date_iso:
             travel_date = date_iso.group(1)
         else:
-            # Check patterns like "20 December" or "20th December"
-            date_words = re.search(r"(\d{1,2})(?:st|nd|rd|th)?\s+(january|february|march|april|may|june|july|august|september|october|november|december)", low)
+            # Check patterns like "20 December", "2nd nov", "2 nov"
+            date_words = re.search(r"(\d{1,2})(?:st|nd|rd|th)?\s+(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)", low)
             if date_words:
                 day = int(date_words.group(1))
-                month_str = date_words.group(2)
+                month_str = date_words.group(2)[:3]
                 month_map = {
-                    "january": 1, "february": 2, "march": 3, "april": 4, "may": 5, "june": 6,
-                    "july": 7, "august": 8, "september": 9, "october": 10, "november": 11, "december": 12
+                    "jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6,
+                    "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12
                 }
-                m = month_map.get(month_str, 12)
+                m = month_map.get(month_str, 11)
                 year = datetime.datetime.now().year
                 travel_date = f"{year}-{m:02d}-{day:02d}"
             elif "tomorrow" in low:
@@ -231,12 +257,26 @@ class DeterministicFallbackProvider(BaseAIProvider):
         elif "fewest" in low or "direct" in low or "less change" in low or "fewer change" in low or "no change" in low:
             preference = "fewest"
 
-        # Max transfers
+        # Max & min transfers
         max_transfers = 2
-        if "direct" in low or "no transfer" in low or "no change" in low:
+        min_transfers = 0
+        if "direct" in low or "no transfer" in low or "no change" in low or "non-stop" in low:
             max_transfers = 0
+            min_transfers = 0
         elif "one change" in low or "1 change" in low or "1 transfer" in low or "one transfer" in low:
             max_transfers = 1
+        
+        if (
+            "at least one stop" in low
+            or "at least 1 stop" in low
+            or "at least one transfer" in low
+            or "at least 1 transfer" in low
+            or "with stop" in low
+            or "with layover" in low
+            or "connecting" in low
+            or "transfer" in low and max_transfers != 0
+        ):
+            min_transfers = 1
 
         # Passenger count
         passengers = 1
@@ -273,6 +313,7 @@ class DeterministicFallbackProvider(BaseAIProvider):
             "departure_time_preference": None,
             "passenger_count": passengers,
             "max_transfers": max_transfers,
+            "min_transfers": min_transfers,
             "preference": preference,
             "is_complete": is_complete,
             "missing_fields": missing_fields,

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
-import { User, Plus, Trash2, ShieldCheck, AlertCircle, ArrowRight, Clock, IndianRupee, Train, CheckCircle } from 'lucide-react';
+import { User, Plus, Trash2, ShieldCheck, AlertCircle, ArrowRight, Clock, IndianRupee, Train, CheckCircle, Armchair } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
 import { RouteItinerary, Passenger, BookingPreview } from '../types';
@@ -223,7 +223,7 @@ const BookingReviewPage: React.FC = () => {
                 )}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
                 <div className="sm:col-span-2 space-y-1">
                   <label className="text-[11px] text-slate-400">Full Name</label>
                   <input
@@ -260,6 +260,57 @@ const BookingReviewPage: React.FC = () => {
                     <option value="Female">Female</option>
                     <option value="Other">Other</option>
                   </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[11px] text-slate-400 flex items-center gap-1">
+                    <Armchair className="w-3 h-3 text-railway-teal" /> Berth Choice
+                  </label>
+                  <select
+                    value={pax.berth_preference || 'Lower'}
+                    onChange={(e) => handlePassengerChange(idx, 'berth_preference', e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-railway-card border border-railway-border text-white text-xs focus:outline-none focus:border-railway-teal"
+                  >
+                    <option value="Lower">Lower Berth</option>
+                    <option value="Middle">Middle Berth</option>
+                    <option value="Upper">Upper Berth</option>
+                    <option value="Side Lower">Side Lower</option>
+                    <option value="Side Upper">Side Upper</option>
+                    <option value="Window">Window Seat</option>
+                    <option value="No Preference">No Preference</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Coach Seat Number Picker */}
+              <div className="pt-2 border-t border-railway-border/40 flex items-center justify-between flex-wrap gap-2 text-xs">
+                <span className="text-slate-400 text-[11px] flex items-center gap-1 font-medium">
+                  <Train className="w-3 h-3 text-sky-400" /> Choose Seat / Berth:
+                </span>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  {[
+                    `B1-${10 + idx * 4} (Lower)`,
+                    `B1-${11 + idx * 4} (Middle)`,
+                    `B1-${12 + idx * 4} (Upper)`,
+                    `B1-${15 + idx * 4} (Side Lower)`,
+                    `B1-${16 + idx * 4} (Side Upper)`,
+                  ].map((seat) => {
+                    const isSelected = pax.seat_number === seat;
+                    return (
+                      <button
+                        key={seat}
+                        type="button"
+                        onClick={() => handlePassengerChange(idx, 'seat_number', isSelected ? undefined : seat)}
+                        className={`px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all ${
+                          isSelected
+                            ? 'bg-railway-teal text-white shadow-md shadow-sky-500/20 font-bold border border-sky-400'
+                            : 'bg-railway-card text-slate-300 hover:text-white border border-railway-border hover:border-slate-500'
+                        }`}
+                      >
+                        {seat}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>

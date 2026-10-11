@@ -166,9 +166,16 @@ const BookingDetailsPage: React.FC = () => {
                     Age: {pax.age} • {pax.gender}
                   </span>
                 </div>
-                <span className="text-[11px] px-2 py-0.5 rounded bg-railway-card text-railway-teal border border-railway-border font-medium">
-                  {pax.berth_preference || 'Confirmed Seat'}
-                </span>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  {pax.seat_number && (
+                    <span className="text-[11px] px-2 py-0.5 rounded bg-railway-teal/20 text-sky-300 border border-railway-teal/40 font-mono font-bold">
+                      Seat: {pax.seat_number}
+                    </span>
+                  )}
+                  <span className="text-[11px] px-2 py-0.5 rounded bg-railway-card text-railway-teal border border-railway-border font-medium">
+                    {pax.berth_preference || 'Confirmed Seat'}
+                  </span>
+                </div>
               </div>
             ))}
           </div>

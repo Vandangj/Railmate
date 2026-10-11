@@ -101,6 +101,7 @@ export interface Passenger {
   age: number;
   gender: 'Male' | 'Female' | 'Other' | 'M' | 'F' | 'O';
   berth_preference?: string;
+  seat_number?: string;
 }
 
 export interface BookingPreview {

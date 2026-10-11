@@ -14,14 +14,15 @@ class Settings(BaseSettings):
 
     # AI Configuration
     AI_PROVIDER: str = "gemini"  # "gemini", "openrouter", or "mock"
-    AI_MODEL: str = "gemini-1.5-flash"
+    AI_MODEL: str = "gemini-3.5-flash"
     GEMINI_API_KEY: Optional[str] = None
     OPENROUTER_API_KEY: Optional[str] = None
 
     # Railway Provider Configuration
-    RAILWAY_PROVIDER: str = "demo"  # "demo" or "live"
-    RAILWAY_API_BASE_URL: Optional[str] = "https://api.railway-example.gov.in/v1"
+    RAILWAY_PROVIDER: str = "live"  # "demo" or "live"
+    RAILWAY_API_BASE_URL: Optional[str] = "https://irctc-indian-railway-pnr-status.p.rapidapi.com"
     RAILWAY_API_KEY: Optional[str] = None
+    RAILWAY_API_HOST: Optional[str] = "irctc-indian-railway-pnr-status.p.rapidapi.com"
 
     # Frontend Origin for CORS
     FRONTEND_ORIGIN: str = "http://localhost:5173"

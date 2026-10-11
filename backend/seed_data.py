@@ -47,16 +47,21 @@ def seed_database(db: Session = None):
 
         # 2. Seed Trains
         trains_data = [
-            {"train_number": "RM101", "train_name": "Western Demo Express", "train_type": "Superfast"},
-            {"train_number": "RM205", "train_name": "Desert Link Demo", "train_type": "Express"},
-            {"train_number": "RM310", "train_name": "Capital Connector Demo", "train_type": "Superfast"},
-            {"train_number": "RM420", "train_name": "Gujarat Intercity Demo", "train_type": "Intercity"},
-            {"train_number": "RM501", "train_name": "Deccan Demo Express", "train_type": "Express"},
-            {"train_number": "RM602", "train_name": "Pink City Vande Demo", "train_type": "Vande Bharat"},
-            {"train_number": "RM704", "train_name": "Taj Capital Express", "train_type": "Gatimaan"},
-            {"train_number": "RM808", "train_name": "Ganga Express Demo", "train_type": "Superfast"},
-            {"train_number": "RM915", "train_name": "Konkan Coastal Link", "train_type": "Superfast"},
-            {"train_number": "RM950", "train_name": "Southern Highspeed Demo", "train_type": "Shatabdi"},
+            {"train_number": "12951", "train_name": "MUMBAI RAJDHANI", "train_type": "Rajdhani"},
+            {"train_number": "12952", "train_name": "NEW DELHI RAJDHANI", "train_type": "Rajdhani"},
+            {"train_number": "12955", "train_name": "MUMBAI JAIPUR SUPERFAST", "train_type": "Superfast"},
+            {"train_number": "12956", "train_name": "JAIPUR MUMBAI SUPERFAST", "train_type": "Superfast"},
+            {"train_number": "12009", "train_name": "SHATABDI EXPRESS (MUM-ADI)", "train_type": "Shatabdi"},
+            {"train_number": "12123", "train_name": "DECCAN QUEEN (CSMT-PUNE)", "train_type": "Superfast"},
+            {"train_number": "20977", "train_name": "VANDE BHARAT (DELHI-JAIPUR)", "train_type": "Vande Bharat"},
+            {"train_number": "12002", "train_name": "BHOPAL SHATABDI (NDLS-AGC)", "train_type": "Shatabdi"},
+            {"train_number": "12261", "train_name": "HOWRAH DURONTO EXPRESS", "train_type": "Duronto"},
+            {"train_number": "12137", "train_name": "PUNJAB MAIL", "train_type": "Superfast"},
+            {"train_number": "12627", "train_name": "KARNATAKA EXPRESS", "train_type": "Superfast"},
+            {"train_number": "12628", "train_name": "KARNATAKA EXP (NDLS-SBC)", "train_type": "Superfast"},
+            {"train_number": "12639", "train_name": "BRINDAVAN EXPRESS (MAS-SBC)", "train_type": "Express"},
+            {"train_number": "10103", "train_name": "MANDOVI EXPRESS (CSMT-GOI)", "train_type": "Superfast"},
+            {"train_number": "12560", "train_name": "SHIV GANGA EXPRESS", "train_type": "Superfast"},
         ]
 
         train_map = {}
@@ -71,35 +76,75 @@ def seed_database(db: Session = None):
         # 3. Seed Train Schedules (Creating direct and connecting networks)
         schedules_data = [
             # Mumbai to Ahmedabad
-            {"train": "RM101", "from": "CSMT", "to": "ADI", "dep": "06:10", "arr": "17:40", "dur": 690, "days": "Daily", "fare": 890.0},
-            # Ahmedabad to Jaipur (Leaves at 19:25; layover after RM101 arriving at 17:40 is 1h 45m = 105 mins)
-            {"train": "RM205", "from": "ADI", "to": "JP", "dep": "19:25", "arr": "05:50", "dur": 625, "days": "Daily", "fare": 1050.0},
+            {"train": "12009", "from": "CSMT", "to": "ADI", "dep": "06:10", "arr": "17:40", "dur": 690, "days": "Daily", "fare": 890.0},
+            # Ahmedabad to Jaipur
+            {"train": "12955", "from": "ADI", "to": "JP", "dep": "19:25", "arr": "05:50", "dur": 625, "days": "Daily", "fare": 1050.0},
             # Direct Mumbai to Jaipur
-            {"train": "RM310", "from": "CSMT", "to": "JP", "dep": "15:00", "arr": "04:50", "dur": 830, "days": "Daily", "fare": 1250.0},
+            {"train": "12955", "from": "CSMT", "to": "JP", "dep": "15:00", "arr": "04:50", "dur": 830, "days": "Daily", "fare": 1250.0},
             # Ahmedabad to Vadodara
-            {"train": "RM420", "from": "ADI", "to": "BRC", "dep": "07:30", "arr": "09:10", "dur": 100, "days": "Daily", "fare": 350.0},
+            {"train": "12009", "from": "ADI", "to": "BRC", "dep": "07:30", "arr": "09:10", "dur": 100, "days": "Daily", "fare": 350.0},
             # Mumbai to Pune
-            {"train": "RM501", "from": "CSMT", "to": "PUNE", "dep": "11:30", "arr": "15:00", "dur": 210, "days": "Daily", "fare": 450.0},
+            {"train": "12123", "from": "CSMT", "to": "PUNE", "dep": "11:30", "arr": "15:00", "dur": 210, "days": "Daily", "fare": 450.0},
             # Pune to Mumbai
-            {"train": "RM501", "from": "PUNE", "to": "CSMT", "dep": "16:30", "arr": "20:00", "dur": 210, "days": "Daily", "fare": 450.0},
+            {"train": "12123", "from": "PUNE", "to": "CSMT", "dep": "16:30", "arr": "20:00", "dur": 210, "days": "Daily", "fare": 450.0},
             # Delhi to Jaipur
-            {"train": "RM602", "from": "NDLS", "to": "JP", "dep": "06:10", "arr": "10:35", "dur": 265, "days": "Daily", "fare": 820.0},
+            {"train": "20977", "from": "NDLS", "to": "JP", "dep": "06:10", "arr": "10:35", "dur": 265, "days": "Daily", "fare": 820.0},
             # Jaipur to Delhi
-            {"train": "RM602", "from": "JP", "to": "NDLS", "dep": "17:45", "arr": "22:15", "dur": 270, "days": "Daily", "fare": 820.0},
+            {"train": "20977", "from": "JP", "to": "NDLS", "dep": "17:45", "arr": "22:15", "dur": 270, "days": "Daily", "fare": 820.0},
             # Delhi to Agra
-            {"train": "RM704", "from": "NDLS", "to": "AGC", "dep": "08:10", "arr": "09:50", "dur": 100, "days": "Daily", "fare": 450.0},
+            {"train": "12002", "from": "NDLS", "to": "AGC", "dep": "08:10", "arr": "09:50", "dur": 100, "days": "Daily", "fare": 450.0},
             # Agra to Kanpur
-            {"train": "RM704", "from": "AGC", "to": "CNB", "dep": "11:00", "arr": "14:30", "dur": 210, "days": "Daily", "fare": 520.0},
+            {"train": "12002", "from": "AGC", "to": "CNB", "dep": "11:00", "arr": "14:30", "dur": 210, "days": "Daily", "fare": 520.0},
             # Kanpur to Varanasi
-            {"train": "RM808", "from": "CNB", "to": "BSB", "dep": "16:00", "arr": "20:30", "dur": 270, "days": "Daily", "fare": 610.0},
+            {"train": "12560", "from": "CNB", "to": "BSB", "dep": "16:00", "arr": "20:30", "dur": 270, "days": "Daily", "fare": 610.0},
             # Delhi to Varanasi (Direct)
-            {"train": "RM808", "from": "NDLS", "to": "BSB", "dep": "06:00", "arr": "14:15", "dur": 495, "days": "Daily", "fare": 1180.0},
+            {"train": "12560", "from": "NDLS", "to": "BSB", "dep": "06:00", "arr": "14:15", "dur": 495, "days": "Daily", "fare": 1180.0},
             # Mumbai to Goa
-            {"train": "RM915", "from": "CSMT", "to": "GOI", "dep": "05:25", "arr": "16:15", "dur": 650, "days": "Daily", "fare": 950.0},
+            {"train": "10103", "from": "CSMT", "to": "GOI", "dep": "05:25", "arr": "16:15", "dur": 650, "days": "Daily", "fare": 950.0},
             # Bengaluru to Chennai
-            {"train": "RM950", "from": "SBC", "to": "MAS", "dep": "06:00", "arr": "10:45", "dur": 285, "days": "Daily", "fare": 690.0},
+            {"train": "12639", "from": "SBC", "to": "MAS", "dep": "06:00", "arr": "10:45", "dur": 285, "days": "Daily", "fare": 690.0},
             # Chennai to Bengaluru
-            {"train": "RM950", "from": "MAS", "to": "SBC", "dep": "17:30", "arr": "22:15", "dur": 285, "days": "Daily", "fare": 690.0},
+            {"train": "12639", "from": "MAS", "to": "SBC", "dep": "17:30", "arr": "22:15", "dur": 285, "days": "Daily", "fare": 690.0},
+            # Delhi to Mumbai Central (Direct Golden Corridor)
+            {"train": "12952", "from": "NDLS", "to": "BCT", "dep": "16:55", "arr": "08:35", "dur": 940, "days": "Daily", "fare": 1850.0},
+            # Mumbai Central to Delhi
+            {"train": "12951", "from": "BCT", "to": "NDLS", "dep": "17:00", "arr": "08:30", "dur": 930, "days": "Daily", "fare": 1850.0},
+            # Jaipur to Mumbai Central
+            {"train": "12956", "from": "JP", "to": "BCT", "dep": "14:10", "arr": "06:45", "dur": 995, "days": "Daily", "fare": 1250.0},
+            # Goa to Mumbai
+            {"train": "10103", "from": "GOI", "to": "CSMT", "dep": "10:30", "arr": "21:40", "dur": 670, "days": "Daily", "fare": 950.0},
+            # Varanasi to Kolkata (Howrah)
+            {"train": "12261", "from": "BSB", "to": "HWH", "dep": "06:15", "arr": "14:30", "dur": 495, "days": "Daily", "fare": 780.0},
+            # Kolkata to Varanasi
+            {"train": "12261", "from": "HWH", "to": "BSB", "dep": "16:00", "arr": "00:15", "dur": 495, "days": "Daily", "fare": 780.0},
+            # Ahmedabad to Mumbai
+            {"train": "12009", "from": "ADI", "to": "CSMT", "dep": "06:40", "arr": "14:20", "dur": 460, "days": "Daily", "fare": 890.0},
+            # Bengaluru to Mumbai (Departs 06:00, arrives 20:30)
+            {"train": "12627", "from": "SBC", "to": "CSMT", "dep": "06:00", "arr": "20:30", "dur": 870, "days": "Daily", "fare": 1450.0},
+            # Mumbai to Bengaluru (Departs 07:15, arrives 21:45)
+            {"train": "12628", "from": "CSMT", "to": "SBC", "dep": "07:15", "arr": "21:45", "dur": 870, "days": "Daily", "fare": 1450.0},
+            # Bengaluru to Pune
+            {"train": "12627", "from": "SBC", "to": "PUNE", "dep": "07:00", "arr": "19:30", "dur": 750, "days": "Daily", "fare": 1150.0},
+            # Pune to Delhi (Leaves 21:00, arrives 14:00 next day)
+            {"train": "12137", "from": "PUNE", "to": "NDLS", "dep": "21:00", "arr": "14:00", "dur": 1020, "days": "Daily", "fare": 1720.0},
+            # Delhi to Pune
+            {"train": "12137", "from": "NDLS", "to": "PUNE", "dep": "15:30", "arr": "08:30", "dur": 1020, "days": "Daily", "fare": 1720.0},
+            # Chennai to Delhi (Tamil Nadu Link)
+            {"train": "12627", "from": "MAS", "to": "NDLS", "dep": "22:00", "arr": "06:30", "dur": 1950, "days": "Daily", "fare": 2150.0},
+            # Delhi to Chennai
+            {"train": "12628", "from": "NDLS", "to": "MAS", "dep": "22:30", "arr": "07:10", "dur": 1960, "days": "Daily", "fare": 2150.0},
+            # Direct Karnataka Express link: Bengaluru to Delhi
+            {"train": "12627", "from": "SBC", "to": "NDLS", "dep": "19:20", "arr": "09:00", "dur": 2260, "days": "Daily", "fare": 2650.0},
+            # Direct Karnataka Express link: Delhi to Bengaluru
+            {"train": "12628", "from": "NDLS", "to": "SBC", "dep": "20:00", "arr": "09:40", "dur": 2260, "days": "Daily", "fare": 2650.0},
+            # Mumbai to Varanasi
+            {"train": "12560", "from": "CSMT", "to": "BSB", "dep": "06:00", "arr": "04:30", "dur": 1350, "days": "Daily", "fare": 1350.0},
+            # Varanasi to Mumbai
+            {"train": "12560", "from": "BSB", "to": "CSMT", "dep": "14:00", "arr": "12:30", "dur": 1350, "days": "Daily", "fare": 1350.0},
+            # Direct Mumbai to Kolkata (Howrah)
+            {"train": "12261", "from": "CSMT", "to": "HWH", "dep": "17:15", "arr": "20:40", "dur": 1645, "days": "Daily", "fare": 1950.0},
+            # Kolkata (Howrah) to Mumbai
+            {"train": "12261", "from": "HWH", "to": "CSMT", "dep": "21:00", "arr": "00:25", "dur": 1645, "days": "Daily", "fare": 1950.0},
         ]
 
         for sc in schedules_data:

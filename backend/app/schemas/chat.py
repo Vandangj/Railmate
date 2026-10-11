@@ -10,6 +10,7 @@ class ExtractedEntities(BaseModel):
     departure_time_preference: Optional[str] = None
     passenger_count: Optional[int] = 1
     max_transfers: Optional[int] = 2
+    min_transfers: Optional[int] = 0
     preference: Optional[str] = "fastest"  # fastest, cheapest, fewest
     is_complete: bool = False
     missing_fields: List[str] = []

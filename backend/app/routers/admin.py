@@ -70,16 +70,16 @@ def get_admin_overview(
         ProviderHealthItem(
             name="Google Gemini AI",
             type="AI",
-            status="OPERATIONAL" if (settings.GEMINI_API_KEY and settings.GEMINI_API_KEY != "your_gemini_api_key_here") else "SIMULATED",
+            status="OPERATIONAL" if (settings.GEMINI_API_KEY and settings.GEMINI_API_KEY not in ["", "your_gemini_api_key_here"]) else "SIMULATED",
             latency_ms=45,
             details=f"Provider: {settings.AI_PROVIDER}, Model: {settings.AI_MODEL}"
         ),
         ProviderHealthItem(
             name="Railway Timetable Data",
             type="RAILWAY",
-            status="OPERATIONAL" if settings.RAILWAY_PROVIDER == "live" else "SIMULATED",
+            status="OPERATIONAL" if (settings.RAILWAY_PROVIDER == "live" and settings.RAILWAY_API_KEY and settings.RAILWAY_API_KEY not in ["", "your_railway_api_key_here", "your_indian_railway_api_key_here"]) else "SIMULATED",
             latency_ms=12,
-            details=f"Provider mode: {settings.RAILWAY_PROVIDER.upper()} (Curated Indian Railway stations & schedules)"
+            details=f"Provider mode: {settings.RAILWAY_PROVIDER.upper()} ({'Live Indian Railway API' if settings.RAILWAY_PROVIDER == 'live' else 'Curated Indian Railway stations & schedules'})"
         ),
         ProviderHealthItem(
             name="SQL Database Engine",
@@ -117,16 +117,16 @@ def get_provider_health(
         ProviderHealthItem(
             name="Google Gemini AI Provider",
             type="AI",
-            status="OPERATIONAL" if (settings.GEMINI_API_KEY and settings.GEMINI_API_KEY != "your_gemini_api_key_here") else "SIMULATED",
+            status="OPERATIONAL" if (settings.GEMINI_API_KEY and settings.GEMINI_API_KEY not in ["", "your_gemini_api_key_here"]) else "SIMULATED",
             latency_ms=42,
-            details=f"Current: {settings.AI_PROVIDER}"
+            details=f"Current: {settings.AI_PROVIDER} ({settings.AI_MODEL})"
         ),
         ProviderHealthItem(
             name="Railway Timetable Provider",
             type="RAILWAY",
-            status="OPERATIONAL" if settings.RAILWAY_PROVIDER == "live" else "SIMULATED",
+            status="OPERATIONAL" if (settings.RAILWAY_PROVIDER == "live" and settings.RAILWAY_API_KEY and settings.RAILWAY_API_KEY not in ["", "your_railway_api_key_here", "your_indian_railway_api_key_here"]) else "SIMULATED",
             latency_ms=15,
-            details="Curated schedule network with NetworkX routing"
+            details=f"Mode: {settings.RAILWAY_PROVIDER.upper()} ({'Live Indian Railway API' if settings.RAILWAY_PROVIDER == 'live' else 'Curated schedule network with NetworkX routing'})"
         ),
         ProviderHealthItem(
             name="SQL Database Engine",

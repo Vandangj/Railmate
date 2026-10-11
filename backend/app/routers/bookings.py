@@ -7,6 +7,7 @@ from backend.app.agents.booking_agent import BookingAgent
 from backend.app.agents.reservation_agent import ReservationAgent
 from backend.app.agents.notification_agent import NotificationAgent
 from backend.app.models.user import User
+from backend.app.providers.railway_provider import get_railway_provider
 from backend.app.schemas.booking import (
     BookingPreviewRequest, BookingPreviewResponse,
     BookingCreateRequest, BookingResponse, BookingCancelRequest
@@ -17,6 +18,42 @@ router = APIRouter(prefix="/api/bookings", tags=["Bookings & Trip Management"])
 booking_agent = BookingAgent()
 reservation_agent = ReservationAgent()
 notification_agent = NotificationAgent()
+railway_provider = get_railway_provider()
+
+
+@router.get("/pnr/{pnr_number}")
+def get_pnr_status(
+    pnr_number: str,
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Fetch live PNR status from Indian Railway API (RapidAPI: irctc-indian-railway-pnr-status).
+    Returns booking status, passenger chart, and train info.
+    """
+    result = railway_provider.get_pnr_status(pnr_number)
+    return result
+
+
+@router.get("/live-trains/{from_code}/{to_code}")
+def get_live_trains(
+    from_code: str,
+    to_code: str,
+    date: Optional[str] = None,
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Fetch live trains between two Indian Railway station codes via RapidAPI.
+    Date format: DD-MM-YYYY (optional).
+    """
+    trains = railway_provider.get_trains_between(from_code.upper(), to_code.upper(), date)
+    return {
+        "from": from_code.upper(),
+        "to": to_code.upper(),
+        "date": date,
+        "count": len(trains),
+        "trains": trains,
+        "source": railway_provider.provider_mode,
+    }
 
 @router.post("/preview", response_model=BookingPreviewResponse)
 def get_booking_preview(

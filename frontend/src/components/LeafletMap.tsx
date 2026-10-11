@@ -93,13 +93,22 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
       ['mumbai', 'jaipur'],
       ['mumbai', 'pune'],
       ['ahmedabad', 'vadodara'],
+      ['delhi', 'mumbai'],
       ['delhi', 'jaipur'],
       ['delhi', 'agra'],
+      ['delhi', 'kota'],
+      ['kota', 'mumbai'],
       ['agra', 'kanpur'],
       ['kanpur', 'varanasi'],
+      ['varanasi', 'kolkata'],
       ['delhi', 'varanasi'],
+      ['delhi', 'kolkata'],
       ['mumbai', 'goa'],
+      ['goa', 'bengaluru'],
+      ['mumbai', 'bengaluru'],
       ['bengaluru', 'chennai'],
+      ['chennai', 'kolkata'],
+      ['pune', 'bengaluru'],
     ];
 
     standardCorridors.forEach(([c1, c2]) => {

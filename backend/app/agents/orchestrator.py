@@ -99,6 +99,7 @@ class Orchestrator:
                 travel_date=entities.travel_date,
                 preference=entities.preference or "fastest",
                 max_transfers=entities.max_transfers or 2,
+                min_transfers=entities.min_transfers or 0,
                 user_id=user_id,
                 db=db
             )

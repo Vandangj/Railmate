@@ -31,6 +31,7 @@ class NLUAgent:
                 departure_time_preference=extracted_raw.get("departure_time_preference"),
                 passenger_count=extracted_raw.get("passenger_count", 1),
                 max_transfers=extracted_raw.get("max_transfers", 2),
+                min_transfers=extracted_raw.get("min_transfers", 0),
                 preference=extracted_raw.get("preference", "fastest"),
                 is_complete=extracted_raw.get("is_complete", False),
                 missing_fields=extracted_raw.get("missing_fields", [])

@@ -211,8 +211,8 @@ const TravelAssistantPage: React.FC = () => {
                   <span className="text-xs font-semibold text-slate-300">
                     Found {m.suggested_routes.length} matching journey option(s):
                   </span>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {m.suggested_routes.slice(0, 2).map((route) => (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {m.suggested_routes.slice(0, 5).map((route) => (
                       <div
                         key={route.id}
                         className="p-3.5 rounded-xl bg-railway-slate/40 border border-railway-border hover:border-railway-teal/60 transition-all space-y-2 text-xs"
@@ -246,20 +246,32 @@ const TravelAssistantPage: React.FC = () => {
                           <span className="font-bold text-emerald-400 text-sm">₹{route.fare_inr}</span>
                           <button
                             onClick={() =>
-                              navigate(
-                                `/routes?origin=${encodeURIComponent(route.origin)}&destination=${encodeURIComponent(
-                                  route.destination
-                                )}&date=${route.travel_date}`
-                              )
+                              navigate('/booking/review', { state: { route } })
                             }
                             className="px-2.5 py-1 rounded-lg bg-railway-teal hover:bg-sky-400 text-white font-medium text-xs flex items-center gap-1 transition-colors"
                           >
-                            Select Route <ArrowRight className="w-3 h-3" />
+                            Book This Route <ArrowRight className="w-3 h-3" />
                           </button>
                         </div>
                       </div>
                     ))}
                   </div>
+                  {m.suggested_routes.length > 5 && m.extracted && (
+                    <div className="pt-1 text-right">
+                      <button
+                        onClick={() =>
+                          navigate(
+                            `/routes?origin=${encodeURIComponent(m.extracted.origin)}&destination=${encodeURIComponent(
+                              m.extracted.destination
+                            )}&date=${m.extracted.travel_date}&pref=${m.extracted.preference || 'fastest'}`
+                          )
+                        }
+                        className="text-xs text-railway-teal hover:underline font-semibold"
+                      >
+                        View all {m.suggested_routes.length} ranked options in Route Comparison →
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
 
